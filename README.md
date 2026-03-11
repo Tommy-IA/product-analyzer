@@ -56,6 +56,5 @@ Average final margin with suggested prices: 60.00%
 - No external libraries needed
 
 ## Author
-*Tommaso Marras*
-Learning Python, Machine Learning, and AI tools while working in London.
-This project is part of my journey to transition into tech and remote work.
+**Tommaso Marras**  
+[LinkedIn](https://www.linkedin.com/in/tommaso-marras-a681252ba) · [GitHub](https://github.com/Tommy-IA)
