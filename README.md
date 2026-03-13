@@ -57,4 +57,4 @@ Average final margin with suggested prices: 60.00%
 
 ## Author
 **Tommaso Marras**  
-https://github.com/Tommy-IA · [LinkedIn](https://www.linkedin.com/in/tommaso-marras-a681252ba)  
+[GitHub](https://github.com/Tommy-IA) · [LinkedIn](https://www.linkedin.com/in/tommaso-marras-a681252ba)  
