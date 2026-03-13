@@ -57,4 +57,7 @@ Average final margin with suggested prices: 60.00%
 
 ## Author
 **Tommaso Marras**  
+<a href="https://github.com/Tommy-IA" target="_blank">
+<img src="https://raw.githubusercontent.com/Tommy-IA/tesla-game-stock-analysis/main/logo.png" width="35">
+</a>
 [LinkedIn](https://www.linkedin.com/in/tommaso-marras-a681252ba) · [GitHub](https://github.com/Tommy-IA)
