@@ -43,13 +43,10 @@ Increase percentage: 125.00%
 Average initial margin for all products: 41.43%
 Average final margin with suggested prices: 60.00%
 
-## ## Features for V2.0
-- Markup calculation and alerts
-- Option to skip the initial price for a direct suggested price
-- Save data to CSV/JSON for history and generate reports 
-  with alerts for underperforming products
-- Restaurant features such as plate cost calculation 
-  from ingredient weight and price
+## ## Features for V1.2.5
+- Trasform report into dataset
+- Dish cost from ingredients, Food Cost for entire restaurant over a period
+- Business type selection, different ranges for business type
 
 ## Requirements
 - Python 3.13
