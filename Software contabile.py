@@ -3,6 +3,49 @@ def margin(price, cost):
         raise ValueError("Price must be greater than 0.0")
     return ((price - cost) / price) * 100
 
+def food_cost(cost, price):
+    if price <= 0.0:
+        raise ValueError("Price must be greater than 0.0")
+    return (cost/price)*100
+
+def markUp(cost, price):
+    if cost <= 0.0:
+        raise ValueError("Cost must be greater than 0.0")
+    return ((price-cost) / cost) *100
+
+RESTAURANT_RANGES = {
+    "markup":{
+        "red_low": 50,
+        "green_low":100,
+        "green_high":300,
+        "red_high":400
+    },
+    "food_cost":{
+        "red_low":20,
+        "green_low":25,
+        "green_high":35,
+        "red_high":40
+    },
+    "margin": {
+        "red_low":55,
+        "green_low":65,
+        "green_high":75,
+        "red_high":80
+    }
+}
+
+
+def alert_function(value, metric_type):
+    if metric_type not in RESTAURANT_RANGES:
+        raise ValueError(f"Invalid metric type: {metric_type}")
+    ranges = RESTAURANT_RANGES[metric_type]
+    if value < ranges["red_low"] or value >= ranges["red_high"]:
+        return "🔴 PROBLEM range out of limits for standard business"
+    elif ranges["green_low"] <= value <= ranges["green_high"]:
+        return "🟢 PERFECT range on line with limits for standard business"
+    else:
+        return "🟡 ATTENTION range going out of limits for standard business"
+    
 
 def average_margin(list_price, list_cost):
     if len(list_price) == 0:
@@ -35,26 +78,32 @@ def suggest_price(list_cost, target_margin) -> list[float]:
 def profit_analysis(report):
     profit = []
     for item in report:
-        product_name = item["Product"]
-        current_price = item["Current price"]
-        cost = item["Initial cost"]
-        suggested_price = item["Suggested price"]
-        current_profit = current_price - cost
-        if suggested_price is not None and suggested_price >= current_price:
-            final_price = suggested_price
+        if item.get("Current price") is None:
+            continue
         else:
-            final_price = current_price
-        potential_profit = final_price - cost
-        record = {
-            "Product": product_name,
-            "Current profit": current_profit
-        }
-        if final_price != current_price:
-            record["Potential profit"] = potential_profit
-            difference = potential_profit - current_profit
-            record["Profit difference"] = difference
-            record["Increase percentage"] = (difference / current_profit) * 100
-        profit.append(record)
+            product_name = item["Product"]
+            current_price = item["Current price"]
+            cost = item["Initial cost"]
+            suggested_price = item["Suggested price"]
+            current_profit = current_price - cost
+            if suggested_price is not None and suggested_price >= current_price:
+                final_price = suggested_price
+            else:
+                final_price = current_price
+            potential_profit = final_price - cost
+            record = {
+                "Product": product_name,
+                "Current profit": current_profit
+            }
+            if final_price != current_price:
+                record["Potential profit"] = potential_profit
+                difference = potential_profit - current_profit
+                record["Profit difference"] = difference
+                if current_profit != 0:
+                    record["Increase percentage"] = (difference / current_profit) * 100
+                else:
+                    record["Increase percentage"] = 0
+            profit.append(record)
     return profit
 
 
@@ -71,25 +120,65 @@ def analyze_menu(list_products, list_price, list_cost, target_margin):
     if len(list_price) != len(list_products):
         raise ValueError("The lists must contain the same number of elements")
     for product, price, cost in zip(list_products, list_price, list_cost):
-        m = margin(price, cost)
-        if m < target_margin:
+        if price is None:
             suggested_price = suggest_price_one(cost, target_margin)
+            markupNP = markUp(cost, suggested_price)
+            foodcostNP = food_cost(cost, suggested_price)
+            profit = suggested_price - cost
+            checkNP = alert_function(markupNP,"markup")
+            checkFCNP = alert_function(foodcostNP,"food_cost")
+            report.append({
+                "Product": product,
+                "Initial cost": cost,
+                "Target margin %": target_margin,
+                "Potential profit": profit,
+                "Suggested price": suggested_price,
+                "MarkUP by suggeested price in % " : markupNP,
+                "Check Markup with suggested price" : checkNP,
+                "FoodCost by suggested price in %" : foodcostNP,
+                "Check FoodCost with suggested price" : checkFCNP
+            })
         else:
-            suggested_price = None
-        report.append({
-            "Product": product,
-            "Initial cost": cost,
-            "Current price": price,
-            "Margin %": m,
-            "Suggested price": suggested_price,
-        })
+            m = margin(price, cost)
+            markupYP = markUp(cost, price)
+            foodcostYP = food_cost(cost, price)
+            checkMPYP = alert_function(markupYP,"markup")
+            checkFCYP = alert_function(foodcostYP,"food_cost")
+            checkME = alert_function(m,"margin")
+            if m < target_margin:
+                suggested_price = suggest_price_one(cost, target_margin)
+            else:
+                suggested_price = None
+            report.append({
+                "Product": product,
+                "Initial cost": cost,
+                "Current price": price,
+                "Margin %": m,
+                "Check Margin":checkME,
+                "Suggested price": suggested_price,
+                "MarkUP by original price in % " : markupYP,
+                "Check MarkUP with original price" : checkMPYP,
+                "FoodCost by original price in %" : foodcostYP,
+                "Check FoodCost with original price" : checkFCYP
+            })
+            if suggested_price is not None:
+                markupSG = markUp(cost,suggested_price)
+                foodcostSG = food_cost(cost, suggested_price)
+                checkNPs = alert_function(markupSG,"markup")
+                checkFCNPs = alert_function(foodcostSG,"food_cost")
+                report[-1]["MArkUP by suggested price in %"] = markupSG
+                report[-1]["Check MarkUP by suggested price"] = checkNPs
+                report[-1]["FoodCost by suggested price in %"] = foodcostSG
+                report[-1]["Check FoodCost by suggested price"] = checkFCNPs
     profit = profit_analysis(report)
-    for product, profit_item in zip(report, profit):
-        product["Current profit"] = profit_item["Current profit"]
-        if "Potential profit" in profit_item:
-            product["Potential profit"] = profit_item["Potential profit"]
-            product["Profit difference"] = profit_item["Profit difference"]
-            product["Increase percentage"] = profit_item["Increase percentage"]
+    for product in report:
+        for profit_item in profit:
+            if profit_item["Product"] == product["Product"]:
+                product["Current profit"] = profit_item["Current profit"]
+                if "Potential profit" in profit_item:
+                    product["Potential profit"] = profit_item["Potential profit"]
+                    product["Profit difference"] = profit_item["Profit difference"]
+                    product["Increase percentage"] = profit_item["Increase percentage"]
     return report
 
 
@@ -141,10 +230,13 @@ def input_float(prompt):
 def build_final_prices(report):
     final_prices = []
     for item in report:
-        if item["Suggested price"] is not None and item["Suggested price"] >= item["Current price"]:
+        if item.get("Current price") is None:
             final_prices.append(item["Suggested price"])
         else:
-            final_prices.append(item["Current price"])
+            if item["Suggested price"] is not None and item["Suggested price"] >= item["Current price"]:
+                        final_prices.append(item["Suggested price"])
+            else:
+                final_prices.append(item["Current price"])
     return final_prices
 
 
@@ -162,39 +254,87 @@ def main():
                 print("Please enter a valid product name.")
                 continue
             list_products.append(product)
-        for product in list_products:
-            cost_input = input_float(f"Enter the initial cost for {product}: ")
-            list_cost.append(cost_input)
-            price_input = input_float(f"Enter the current price for {product}: ")
-            list_price.append(price_input)
+            while True:
+                price_get = input(f"Do you have the initial price for {product} (Y/N): ").strip().lower()
+                if price_get != "y" and price_get != "n":
+                    print("Please answer Y or N")
+                    continue
+                if price_get == "y":
+                        cost_input = input_float(f"Enter the initial cost for {product}: ")
+                        list_cost.append(cost_input)
+                        price_input = input_float(f"Enter the current price for {product}: ")
+                        list_price.append(price_input)
+                        break
+                else:
+                        cost_input = input_float(f"Enter the cost for {product}: ")
+                        list_cost.append(cost_input)
+                        list_price.append(None)
+                        break
+        filtered_price = []
+        filtered_cost = []
+        for price, cost in zip (list_price, list_cost):
+            if price is not None:
+                filtered_price.append(price)
+                filtered_cost.append(cost)
+        if len(filtered_cost) == 0:
+            average_m = None
+        else:
+            average_m = average_margin(filtered_price, filtered_cost)
         report = analyze_menu(list_products, list_price, list_cost, target_margin)
-        average_m = average_margin(list_price, list_cost)
         final_prices = build_final_prices(report)
         average_nm = average_margin(final_prices, list_cost)
         print("\n-- Report --")
         print(f"Target margin: {target_margin:.2f}%")
         for item in report:
-            if "Potential profit" in item:
+            if item.get("Current price") is None:
                 print(f"\nProduct: {item['Product']}")
                 print(f"Initial cost: £{item['Initial cost']:.2f}\n"
-                      f"Current price: £{item['Current price']:.2f}\n"
-                      f"Current margin: {item['Margin %']:.2f}%\n"
-                      f"Current profit: £{item['Current profit']:.2f}\n"
-                      f"Potential profit: £{item['Potential profit']:.2f}\n"
-                      f"Profit difference: £{item['Profit difference']:.2f}\n")
+                      f"Target margin %: {item['Target margin %']:.2f}\n"
+                      f"Potential profit: £{item['Potential profit']:.2f}\n")
             else:
-                print(f"\nProduct: {item['Product']}")
-                print(f"Initial cost: £{item['Initial cost']:.2f}\n"
-                      f"Current price: £{item['Current price']:.2f}\n"
-                      f"Margin: {item['Margin %']:.2f}%\n"
-                      f"Profit: £{item['Current profit']:.2f}\n"
-                      "No increase expected")
-            if item["Suggested price"] is None or item["Current price"] >= item["Suggested price"]:
-                print("Suggested price: No change needed")
+                if "Potential profit" in item:
+                    print(f"\nProduct: {item['Product']}")
+                    print(f"Initial cost: £{item['Initial cost']:.2f}\n"
+                        f"Current price: £{item['Current price']:.2f}\n"
+                        f"Current margin: {item['Margin %']:.2f}%\n"
+                        f"Current profit: £{item['Current profit']:.2f}\n"
+                        f"Potential profit: £{item['Potential profit']:.2f}\n"
+                        f"Profit difference: £{item['Profit difference']:.2f}\n")
+                else:
+                    print(f"\nProduct: {item['Product']}")
+                    print(f"Initial cost: £{item['Initial cost']:.2f}\n"
+                        f"Current price: £{item['Current price']:.2f}\n"
+                        f"Margin: {item['Margin %']:.2f}%\n"
+                        f"Profit: £{item['Current profit']:.2f}\n"
+                        "No increase expected")
+            if item.get("Current price") is None:
+                print(f"Suggested price with target margin: £{item['Suggested price']:.2f}\n"
+                    f"MArkUP by suggested price: {item['MarkUP by suggeested price in % ']:.2f}%\n"
+                    f"Check MarkUP by suggested price: {item['Check Markup with suggested price']}\n"
+                    f"FoodCost by suggested price: {item['FoodCost by suggested price in %']:.2f}%\n"
+                    f"Check FoodCost by suggested price: {item['Check FoodCost with suggested price']}\n")
             else:
-                print(f"Suggested price with target margin: £{item['Suggested price']:.2f}")
-                print(f"Increase percentage: {item['Increase percentage']:.2f}%")
-        print(f"\nAverage initial margin for all products: {average_m:.2f}%")
+                if item["Suggested price"] is None or item.get("Current price") >= item["Suggested price"]:
+                    print(  "Suggested price: No change needed\n"
+                            f"MarkUP: {item['MarkUP by original price in % ']:.2f}%\n"
+                            f"Check MarkUP: {item['Check MarkUP with original price']}\n"
+                            f"FoodCost: {item['FoodCost by original price in %']:.2f}%\n"
+                            f"Check FoodCost: {item['Check FoodCost with original price']}\n")
+                else:
+                    print(
+                        f"Suggested price with target margin: £{item['Suggested price']:.2f}\n"
+                        f"MarkUP by original price: {item['MarkUP by original price in % ']:.2f}%\n"
+                        f"Check MarkUP with original price: {item['Check MarkUP with original price']}\n"
+                        f"FoodCost by original price: {item['FoodCost by original price in %']:.2f}%\n"
+                        f"Check FoodCost with original price: {item['Check FoodCost with original price']}\n"
+                        f"MarkUP by suggested price: {item['MArkUP by suggested price in %']:.2f}%\n"
+                        f"Check MarkUP by suggested price: {item['Check MarkUP by suggested price']}\n"
+                        f"FoodCost by suggested price: {item['FoodCost by suggested price in %']:.2f}%\n"
+                        f"Check FoodCost by suggested price: {item['Check FoodCost by suggested price']}\n"
+                        f"Increase percentage: {item['Increase percentage']:.2f}%"
+                    )
+        if len(filtered_price) > 0:
+           print(f"\nAverage initial margin for all products: {average_m:.2f}%")
         if any("Potential profit" in item for item in report):
             print(f"Average final margin with suggested prices: {average_nm:.2f}%")
     except ValueError as e:
