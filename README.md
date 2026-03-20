@@ -1,47 +1,63 @@
-# product-analyzer
-This short software helps a business insert a target margin,  the cost and the price for a product and calculates the actual margin, the actual profit, and if under the target, suggests a new price, calculating the potential profit, the difference from the original price and the average margin.
-The user only needs to insert a target margin, the initial cost and the base price for each product. 
-It will print an easy to read report.
+# Product Analyzer
 
-## Output
-Here a example of a output using 2 items in a pawn shops, using a computer and a smarthphone:
+A Python-based tool designed to help businesses analyze product profitability and optimize pricing strategies based on a target margin.
 
-Enter the target margin (e.g. 60%): 60
-Enter a product name (or 'done' to finish): Laptop
-Enter a product name (or 'done' to finish): Smartphone
-Enter a product name (or 'done' to finish): done
-Enter the initial cost for Laptop: 200
-Enter the current price for Laptop: 350£
-Enter the initial cost for Smartphone: 120
-Enter the current price for Smartphone: 200
+## Overview
 
--- Report --
-Target margin: 60.00%
+Product Analyzer allows you to evaluate the performance of your products by comparing current pricing with a desired target margin.
+The software calculates:
+- Current margin and profit
+- Suggested price to reach the target margin
+- Potential profit increase
+- Markup and food cost percentages
+- Performance indicators with visual alerts
 
-Product: Laptop
-Initial cost: £200.00
-Current price: £350.00
-Current margin: 42.86%
-Current profit: £150.00
-Potential profit: £300.00
-Profit difference: £150.00
+## This tool is especially useful for:
 
-Suggested price with target margin: £500.00
-Increase percentage: 100.00%
+Restaurants 
 
-Product: Smartphone
-Initial cost: £120.00
-Current price: £200.00
-Current margin: 40.00%
-Current profit: £80.00
-Potential profit: £180.00
-Profit difference: £100.00
+Retail businesses 
 
-Suggested price with target margin: £300.00
-Increase percentage: 125.00%
+Small business owners 
 
-Average initial margin for all products: 41.43%
-Average final margin with suggested prices: 60.00%
+## Features
+
+- Input multiple products in a single session
+- Automatic margin and profit calculations
+- Target-based price optimization
+- Markup (%) and Food Cost (%) analysis
+- Visual performance alerts (🟢 🟡 🔴)
+- Clean and structured terminal report
+
+### How It Works
+
+Insert your target margin
+
+Add your products
+
+Enter cost and current price for each product
+
+Get a full profitability report instantly
+
+Example Output
+Target margin: 65.00%
+
+Product: Margherita
+Initial cost: £3.00
+Current price: £10.00
+Margin: 70.00%
+Profit: £7.00
+Suggested price: No change needed
+Markup: 233.33%
+Food Cost: 30.00%
+Status: 🟢
+
+Product: Pasta
+Initial cost: £3.85
+Suggested price: £11.00
+Markup: 185.71%
+Food Cost: 35.00%
+Status: 🟢
 
 ## ## Features for V1.2.5
 - Trasform report into dataset
