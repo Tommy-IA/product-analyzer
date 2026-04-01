@@ -59,10 +59,8 @@ Markup: 185.71%
 Food Cost: 35.00%
 Status: 🟢
 
-## Features for V1.2.5
-- Trasform report into dataset
-- Dish cost from ingredients, Food Cost for entire restaurant over a period
-- Business type selection, different ranges for business type
+## Future Features
+v2.0 — AI Agent (in progress): Adding an AI agent loop with function calling. The agent autonomously calculates margins, food costs, markup, and generates reports using OpenAI's GPT-4o
 
 ## Requirements
 - Python 3.13
